@@ -3,10 +3,10 @@ import cursorImage from "./../../assets/cursor.cur";
 import * as Colyseus from "colyseus.js";
 
 
-const endpoint = (window.location.hostname === "localhost") ? `ws://localhost:${process.env.PORT}` : `${window.location.protocol.replace("http", "ws")}//${window.location.hostname}:${process.env.PORT}`;
+//const endpoint = (window.location.hostname === "localhost") ? `ws://localhost:${process.env.PORT}` : `${window.location.protocol.replace("http", "ws")}//${window.location.hostname}:${process.env.PORT}`;
 
 //for heroku remote deployment...to run it locally comment the code below and uncomment the code at the top
-//const endpoint = (window.location.protocol === "http:") ? `ws://${process.env.APP_URL}` : `wss://${process.env.APP_URL}`
+const endpoint = (window.location.protocol === "http:") ? `ws://${process.env.APP_URL}` : `wss://${process.env.APP_URL}`
 
 var client = new Colyseus.Client(endpoint);
 
@@ -85,11 +85,6 @@ export default class PlayScene extends Phaser.Scene {
 
             this.room.onStateChange.addOnce((state) => {
 
-                self.scene.launch("HUD", {
-                    name: self.player.name,
-                    players_online: state.players_online + 1 //plus himself
-                }); //later we need to load dirrent componets of the HUD when its data to display is available
-
                 // Loop over all the player data received
                 for (let id in state.players) {
                     // If the player hasn't been created yet
@@ -166,8 +161,13 @@ export default class PlayScene extends Phaser.Scene {
                 let spawnPoint = this.map.findObject("player", obj => obj.name === `player${message.position}`);
                 let position = {
                     x: spawnPoint.x,
-                    y: spawnPoint.y
+                    y: spawnPoint.y,
                 }
+
+                self.scene.launch("HUD", {
+                    name: self.player.name,
+                    players_online: message.players_online
+                }); //later we need to load dirrent componets of the HUD when its data to display is available
 
                 this.room.send({
                     action: "initial_position",
