@@ -36,7 +36,6 @@ class State extends Schema {
         this.bullet_index = 0;
         this.players_online = 0;
         this.killsList = [];
-        this.mapNum = Math.floor(Math.random() * 3); ;
     }
 
     getNextPosition() {
@@ -138,12 +137,6 @@ exports.outdoor = class extends colyseus.Room {
     }
 
     onJoin(client, options) {
-        console.log("before join broadcast: map num", this.state.mapNum, ", players", this.state.players_online);
-        this.broadcast({
-            event: "map_num",
-            mapNum: this.state.mapNum
-        });
-
         let nextPosition = this.state.getNextPosition();
         this.state.createPlayer(client.sessionId, options.name);
         this.send(client, {
@@ -179,8 +172,6 @@ exports.outdoor = class extends colyseus.Room {
             event: "leaderboard",
             killsList: this.state.killsList
         });
-
-        console.log("from join: map num", this.state.mapNum, ", players", this.state.players_online);
 
     }
 
